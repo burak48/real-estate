@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import EstateDashboard from '@/components/EstateDashboard.vue';
-
+import EstateDashboard from '@/components/EstateDashboard.vue'
+import EstateAppointments from '@/components/EstateAppointments.vue'
+import EstateCreateAppointment from '@/components/EstateCreateAppointment.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,7 +9,17 @@ const router = createRouter({
     {
       path: '/',
       name: 'EstateDashboard',
-      component: EstateDashboard,
+      component: EstateDashboard
+    },
+    {
+      path: '/appointments',
+      name: 'EstateAppointments',
+      component: EstateAppointments
+    },
+    {
+      path: '/create-appointment',
+      name: 'EstateCreateAppointment',
+      component: EstateCreateAppointment
     },
     {
       path: '/about',
