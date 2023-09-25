@@ -4,7 +4,6 @@
 
     <!-- Appointment Form -->
     <form class="w-full max-w-md" @submit.prevent="createAppointment">
-
       <!-- Postal Code of Appointment Address -->
       <div class="mb-4">
         <label for="postalCode" class="block text-sm font-medium text-gray-700"
@@ -87,7 +86,7 @@
 
       <!-- Submit Button -->
       <div class="mt-4">
-        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+        <button type="submit" class="px-4 py-2 bg-blue-950 text-white rounded-md hover:bg-blue-600">
           Create Appointment
         </button>
       </div>
@@ -98,7 +97,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Map from '@/components/EstateMap.vue'
-
 
 const appointment = ref({
   postalCode: 'cm27pj',

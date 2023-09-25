@@ -12,7 +12,7 @@ import { Loader, type LoaderOptions } from '@googlemaps/js-api-loader'
 
 const position = ref({ lat: 51.7292, lng: 0.478 })
 const showDirections = ref(false)
-const directionsSteps = ref([]);
+const directionsSteps = ref([])
 const totalDuration = ref('')
 let marker: google.maps.Marker | null = null
 let destinationMarker: google.maps.Marker | null = null
