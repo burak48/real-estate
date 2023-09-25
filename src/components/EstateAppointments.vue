@@ -46,6 +46,24 @@
             </tr>
           </tbody>
         </table>
+
+        <div class="flex justify-between items-center mt-4">
+          <button
+            class="px-4 py-2 rounded bg-blue-950 text-white hover:bg-blue-600"
+            @click="prevPage"
+            :disabled="currentPage === 1"
+          >
+            Previous
+          </button>
+          <div>Page {{ currentPage }} of {{ totalPages }}</div>
+          <button
+            class="px-4 py-2 rounded bg-blue-950 text-white hover:bg-blue-600"
+            @click="nextPage"
+            :disabled="currentPage === totalPages"
+          >
+            Next
+          </button>
+        </div>
       </template>
       <template v-else>
         <p class="text-center">Loading...</p>
@@ -55,13 +73,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { fetchAppointments } from '@/api/index'
 
 const appointments = ref([])
 const sortBy = ref('appointment_date')
 const sortOrder = ref('asc')
 const searchQuery = ref('')
+const itemsPerPage = ref(4)
+const currentPage = ref(1)
 
 onMounted(async () => {
   const fetchedAppointments = await fetchAppointments()
@@ -90,7 +110,10 @@ const sortAppointments = (columnName: string) => {
 
 const filteredAppointments = computed(() => {
   if (!searchQuery.value) {
-    return formattedAppointments.value
+    // return formattedAppointments.value
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value
+    const endIndex = startIndex + itemsPerPage.value
+    return formattedAppointments.value.slice(startIndex, endIndex)
   }
 
   const query = searchQuery.value.toLowerCase()
@@ -102,5 +125,25 @@ const filteredAppointments = computed(() => {
     }
     return false
   })
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(formattedAppointments.value.length / itemsPerPage.value)
+})
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+watch(searchQuery, () => {
+  currentPage.value = 1
 })
 </script>
