@@ -53,7 +53,7 @@
                 </button>
                 <button
                   class="px-2 py-1 text-white bg-red-500 hover:bg-red-600 w-16"
-                  @click="deleteAppointment(appointment)"
+                  @click="deleteCurrentAppointment(appointment.id)"
                 >
                   Delete
                 </button>
@@ -89,7 +89,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import { fetchAppointments } from '@/api/index'
+import { fetchAppointments, deleteAppointment } from '@/api/index'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -107,7 +107,7 @@ onMounted(async () => {
 })
 
 const formattedAppointments = computed(() => {
-    // console.log('appointments.value: ', appointments.value)
+  // console.log('appointments.value: ', appointments.value)
   return appointments.value
 })
 
@@ -137,7 +137,9 @@ const filteredAppointments = computed(() => {
   const query = searchQuery.value.toLowerCase()
   return formattedAppointments.value.filter((appointment) => {
     if (Array.isArray(appointment.fields.agent_name)) {
-        return appointment.fields.agent_name.some((agent: string) => agent.toLowerCase().includes(query))
+      return appointment.fields.agent_name.some((agent: string) =>
+        agent.toLowerCase().includes(query)
+      )
     } else if (typeof appointment.fields.agent_name === 'string') {
       return appointment.fields.agent_name.toLowerCase().includes(query)
     }
@@ -162,15 +164,28 @@ const prevPage = () => {
 }
 
 const editAppointment = (appointment: any) => {
-//   console.log('APPOINTMENT: ', appointment)
+  //   console.log('APPOINTMENT: ', appointment)
   router.replace({
     name: 'EstateEditAppointment',
     params: { id: appointment.id }
   })
 }
 
-const deleteAppointment = (appointment: any) => {
-  console.log('Delete appointment:', appointment)
+const deleteCurrentAppointment = async (id: any) => {
+  //   console.log('Delete appointment:', id)
+  //   const result = await deleteAppointment(id)
+  //   console.log(result);
+  try {
+    console.log('Delete appointment:', id)
+    await deleteAppointment(id)
+
+    // After successful deletion, fetch the updated list of appointments
+    const updatedAppointments = await fetchAppointments()
+    appointments.value = updatedAppointments.records
+    console.log('Appointment deleted successfully.')
+  } catch (error) {
+    console.error('Error deleting appointment:', error)
+  }
 }
 
 watch(searchQuery, () => {

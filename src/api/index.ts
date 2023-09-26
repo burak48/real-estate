@@ -52,3 +52,13 @@ export async function updateAppointment(data) {
   console.log("RESPONSE222: ", response.data)
   // return response.data
 }
+
+export async function deleteAppointment(id) {
+  const response = await api.delete('/Appointments', {
+    params: {
+      records: [id]
+    }
+  })
+
+  return response.data
+}

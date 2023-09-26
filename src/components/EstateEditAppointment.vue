@@ -69,7 +69,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getAppointment, updateAppointment } from '@/api/index'
-import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
