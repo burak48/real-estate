@@ -14,3 +14,8 @@ export async function fetchAppointments() {
   const response = await api.get('/Appointments')
   return response.data
 }
+
+export async function getAppointment(id) {
+  const response = await api.get(`/Appointments/${id}`)
+  return response.data
+}

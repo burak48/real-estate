@@ -22,6 +22,7 @@
               <th class="px-4 py-2 text-left border">Postcode</th>
               <th class="px-4 py-2 text-left border">Contact Name</th>
               <th class="px-4 py-2 text-left border">Agent Name</th>
+              <th class="px-4 py-2 text-left border">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -42,6 +43,20 @@
                     {{ agent || 'N/A' }}
                   </li>
                 </ul>
+              </td>
+              <td class="px-4 py-2 border">
+                <button
+                  class="px-2 py-1 text-white bg-blue-500 hover:bg-blue-600 mr-2 mb-2 w-16"
+                  @click="editAppointment(appointment)"
+                >
+                  Edit
+                </button>
+                <button
+                  class="px-2 py-1 text-white bg-red-500 hover:bg-red-600 w-16"
+                  @click="deleteAppointment(appointment)"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           </tbody>
@@ -75,6 +90,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { fetchAppointments } from '@/api/index'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const appointments = ref([])
 const sortBy = ref('appointment_date')
@@ -89,7 +107,7 @@ onMounted(async () => {
 })
 
 const formattedAppointments = computed(() => {
-  console.log('appointments.value: ', appointments.value)
+    console.log('appointments.value: ', appointments.value)
   return appointments.value
 })
 
@@ -119,7 +137,7 @@ const filteredAppointments = computed(() => {
   const query = searchQuery.value.toLowerCase()
   return formattedAppointments.value.filter((appointment) => {
     if (Array.isArray(appointment.fields.agent_name)) {
-      return appointment.fields.agent_name.some((agent) => agent.toLowerCase().includes(query))
+        return appointment.fields.agent_name.some((agent: string) => agent.toLowerCase().includes(query))
     } else if (typeof appointment.fields.agent_name === 'string') {
       return appointment.fields.agent_name.toLowerCase().includes(query)
     }
@@ -141,6 +159,18 @@ const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--
   }
+}
+
+const editAppointment = (appointment: any) => {
+  console.log('APPOINTMENT: ', appointment)
+  router.replace({
+    name: 'EstateEditAppointment',
+    params: { id: appointment.id }
+  })
+}
+
+const deleteAppointment = (appointment: any) => {
+  console.log('Delete appointment:', appointment)
 }
 
 watch(searchQuery, () => {
