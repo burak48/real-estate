@@ -19,3 +19,36 @@ export async function getAppointment(id) {
   const response = await api.get(`/Appointments/${id}`)
   return response.data
 }
+
+export async function updateAppointment(data) {
+  console.log("DATA: ", data)
+
+  const {
+    fields: {
+      appointment_date,
+      appointment_postcode,
+      contact_id,
+      agent_id,
+    },
+  } = data;
+
+  const newData = {
+    records: [
+      {
+        fields: {
+          appointment_date,
+          appointment_postcode,
+          contact_id,
+          agent_id,
+        },
+      },
+    ],
+  };
+
+  console.log("NEW DATA: ", newData);
+
+  const response = await api.post("/Appointments", newData)
+  console.log("RESPONSE111: ", response)
+  console.log("RESPONSE222: ", response.data)
+  // return response.data
+}

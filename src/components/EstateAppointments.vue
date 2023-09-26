@@ -107,7 +107,7 @@ onMounted(async () => {
 })
 
 const formattedAppointments = computed(() => {
-    console.log('appointments.value: ', appointments.value)
+    // console.log('appointments.value: ', appointments.value)
   return appointments.value
 })
 
@@ -162,7 +162,7 @@ const prevPage = () => {
 }
 
 const editAppointment = (appointment: any) => {
-  console.log('APPOINTMENT: ', appointment)
+//   console.log('APPOINTMENT: ', appointment)
   router.replace({
     name: 'EstateEditAppointment',
     params: { id: appointment.id }
