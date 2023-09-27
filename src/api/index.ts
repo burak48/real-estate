@@ -62,3 +62,41 @@ export async function deleteAppointment(id) {
 
   return response.data
 }
+
+export async function createAppointment(appointmentData) {
+  console.log("DATA: ", appointmentData)
+  try {
+    const requestData = {
+      records: [
+        {
+          fields: {
+            appointment_date: appointmentData.appointmentDate,
+            appointment_postcode: appointmentData.postCode,
+            contact_id: [appointmentData.contactId],
+            agent_id: [appointmentData.agentId],
+          },
+        },
+      ],
+    };
+
+    const response = await api.post('/Appointments', requestData);
+
+    if (response.status === 200) {
+      console.log('Appointment created successfully:', response.data);
+    } else {
+      console.error('Failed to create appointment:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error creating appointment:', error);
+  }
+}
+
+export async function getContacts() {
+  const response = await api.get('/Contacts')
+  return response.data
+}
+
+export async function getAgents() {
+  const response = await api.get('/Agents')
+  return response.data
+}

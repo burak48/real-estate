@@ -4,7 +4,7 @@
 
     <div class="mt-6">
       <!-- Appointment Form -->
-      <form @submit.prevent="createAppointment">
+      <form @submit.prevent="createCurrentAppointment">
         <!-- Postal Code of Appointment Address -->
         <div class="mb-4">
           <label for="postalCode" class="block text-sm font-medium text-gray-700"
@@ -13,7 +13,7 @@
           <input
             type="text"
             id="postalCode"
-            v-model="appointment.postalCode"
+            v-model="appointment.postCode"
             class="mt-1 p-2 w-full border rounded-md"
           />
         </div>
@@ -26,59 +26,60 @@
           <input
             type="date"
             id="appointmentDate"
-            v-model="appointment.date"
+            v-model="appointment.appointmentDate"
             class="mt-1 p-2 w-full border rounded-md"
           />
         </div>
 
-        <!-- Personal Information (Name and Surname) -->
+        <!-- Contact Selection (Select Box) -->
         <div class="mb-4">
-          <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-          <input
-            type="text"
-            id="name"
-            v-model="appointment.name"
+          <label for="contact" class="block text-sm font-medium text-gray-700"
+            >Select Contact</label
+          >
+          <select
+            id="contact"
+            v-model="appointment.contactId"
             class="mt-1 p-2 w-full border rounded-md"
-          />
-        </div>
-        <div class="mb-4">
-          <label for="surname" class="block text-sm font-medium text-gray-700">Surname</label>
-          <input
-            type="text"
-            id="surname"
-            v-model="appointment.surname"
-            class="mt-1 p-2 w-full border rounded-md"
-          />
-        </div>
-
-        <!-- Contact Information (Email and Phone) -->
-        <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            v-model="appointment.email"
-            class="mt-1 p-2 w-full border rounded-md"
-          />
-        </div>
-        <div class="mb-4">
-          <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-          <input
-            type="tel"
-            id="phone"
-            v-model="appointment.phone"
-            class="mt-1 p-2 w-full border rounded-md"
-          />
+          >
+            <option value="">Select a contact</option>
+            <option
+              v-for="(contact, index) in contactOptions"
+              :key="index"
+              :value="contact.contact_id"
+            >
+              <!-- {{ contact.contact_id }} - {{ contact.contact_name }} {{ contact.contact_surname }} -->
+              {{
+                contact.contact_name || contact.contact_surname
+                  ? `${contact.contact_id} - ${contact.contact_name} ${contact.contact_surname}`
+                  : contact.contact_id
+              }}
+            </option>
+          </select>
         </div>
 
-        <!-- Estate Agent Employee Selection (Select Box) -->
+        <!-- Estate Agent Selection (Select Box) -->
         <div class="mb-4">
           <label for="agent" class="block text-sm font-medium text-gray-700"
-            >Estate Agent Employee</label
+            >Select Estate Agent</label
           >
-          <select id="agent" v-model="appointment.agent" class="mt-1 p-2 w-full border rounded-md">
-            <option value="agent1">Agent 1</option>
-            <option value="agent2">Agent 2</option>
+          <select
+            id="agent"
+            v-model="appointment.agentId"
+            class="mt-1 p-2 w-full border rounded-md"
+          >
+            <option value="">Select an estate agent</option>
+            <option
+              v-for="(agent, index) in agentOptions"
+              :key="index"
+              :value="agent.agent_id"
+            >
+              <!-- {{ agent.agent_id }} - {{ agent.agent_name }} {{ agent.agent_surname }} -->
+              {{
+                agent.agent_name || agent.agent_surname
+                  ? `${agent.agent_id} - ${agent.agent_name} ${agent.agent_surname}`
+                  : agent.agent_id
+              }}
+            </option>
           </select>
         </div>
 
@@ -100,20 +101,125 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Map from '@/components/EstateMap.vue'
+import { createAppointment, getContacts, getAgents } from '@/api/index'
 
 const appointment = ref({
-  postalCode: 'cm27pj',
-  date: '',
-  name: '',
-  surname: '',
-  email: '',
-  phone: '',
-  agent: ''
+  appointmentDate: '',
+  appointmentPostCode: '',
+  postCode: 'cm27pj',
+  contactId: '',
+  contactName: '',
+  contactSurname: '',
+  contactEmail: '',
+  contactPhone: '',
+  agentId: '',
+  agentName: '',
+  agentSurname: ''
 })
 
-const createAppointment = () => {
+const resetForm = () => {
+  appointment.value = {
+    appointmentDate: '',
+    appointmentPostCode: '',
+    postCode: 'cm27pj',
+    contactId: '',
+    contactName: '',
+    contactSurname: '',
+    contactEmail: '',
+    contactPhone: '',
+    agentId: '',
+    agentName: '',
+    agentSurname: ''
+  };
+};
+
+
+const contactOptions = ref([])
+const agentOptions = ref([])
+
+const createCurrentAppointment = async () => {
   console.log(appointment.value)
+  const createdAppointments = await createAppointment(appointment.value)
+  console.log('createdAppointments: ', createdAppointments)
+
+  resetForm();
 }
+
+onMounted(async () => {
+  try {
+    const contactsResponse = await getContacts()
+    const agentsResponse = await getAgents()
+    console.log("contactsResponse: ", contactsResponse)
+    console.log("agentsResponse: ", agentsResponse)
+
+    contactOptions.value = contactsResponse.records.map(
+      (record: {
+        id: any,
+        fields: {
+          contact_id: any
+          contact_name: any
+          contact_surname: any
+          contact_email: any
+          contact_phone: any
+        }
+      }) => ({
+        contact_id: record.id,
+        contact_name: record.fields.contact_name,
+        contact_surname: record.fields.contact_surname,
+        contact_email: record.fields.contact_email,
+        contact_phone: record.fields.contact_phone
+      })
+    )
+
+    // console.log('appointment.value.contactOptions: ', appointment.value.contactOptions)
+
+    agentOptions.value = agentsResponse.records.map(
+      (record: { id: any, fields: { agent_id: any; agent_name: any; agent_surname: any } }) => ({
+        agent_id: record.id,
+        agent_name: record.fields.agent_name,
+        agent_surname: record.fields.agent_surname
+      })
+    )
+
+    // console.log('appointment.value.agentOptions: ', appointment.value.agentOptions)
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  }
+})
+
+watch(() => appointment.value.contactId, (newContactId) => {
+  console.log("newContactID: ", newContactId)
+  const selectedContact = contactOptions.value.find(
+    (contact) => contact.contact_id === newContactId
+  );
+  console.log("SELECTED CONTACT: ", selectedContact)
+  if (selectedContact) {
+    appointment.value.contactName = selectedContact.contact_name;
+    appointment.value.contactSurname = selectedContact.contact_surname;
+    appointment.value.contactEmail = selectedContact.contact_email;
+    appointment.value.contactPhone = selectedContact.contact_phone;
+  } else {
+    appointment.value.contactName = '';
+    appointment.value.contactSurname = '';
+    appointment.value.contactEmail = '';
+    appointment.value.contactPhone = '';
+  }
+})
+
+watch(() => appointment.value.agentId, (newAgentId) => {
+  console.log("newAgentId: ", newAgentId)
+  const selectedAgent = agentOptions.value.find(
+    (agent) => agent.agent_id === newAgentId
+  );
+  console.log("SELECTED AGENT: ", selectedAgent)
+  if (selectedAgent) {
+    appointment.value.agentName = selectedAgent.agent_name;
+    appointment.value.agentSurname = selectedAgent.agent_surname;
+  } else {
+    appointment.value.agentName = '';
+    appointment.value.agentSurname = '';
+  }
+})
 </script>
