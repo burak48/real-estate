@@ -133,6 +133,7 @@ const resetForm = () => {
     agentName: '',
     agentSurname: ''
   };
+  destinationPostcode.value = ''
 };
 
 
@@ -146,7 +147,7 @@ const handleDestinationPostcode = (postcode: string) => {
 
 const createCurrentAppointment = async () => {
   console.log(appointment.value)
-  const createdAppointments = await createAppointment(appointment.value)
+  const createdAppointments = await createAppointment(appointment.value, destinationPostcode)
   console.log('createdAppointments: ', createdAppointments)
 
   resetForm();

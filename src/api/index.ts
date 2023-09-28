@@ -57,14 +57,16 @@ export async function deleteAppointment(id) {
   return response.data
 }
 
-export async function createAppointment(appointmentData) {
+export async function createAppointment(appointmentData, destinationPostcode) {
+  console.log("appointmentData: ", appointmentData)
+  console.log("destinationPostcode:", destinationPostcode.value)
   try {
     const requestData = {
       records: [
         {
           fields: {
             appointment_date: appointmentData.appointmentDate,
-            appointment_postcode: appointmentData.postCode,
+            appointment_postcode: destinationPostcode.value,
             contact_id: [appointmentData.contactId],
             agent_id: [appointmentData.agentId],
           },
