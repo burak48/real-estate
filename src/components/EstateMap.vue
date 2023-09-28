@@ -17,6 +17,7 @@ const totalDuration = ref('')
 let marker: google.maps.Marker | null = null
 let destinationMarker: google.maps.Marker | null = null
 let directionsRenderer: google.maps.DirectionsRenderer | null = null // Track directions renderer
+const clickedDestination = ref()
 
 const emit = defineEmits(['destinationPostcode'])
 
@@ -54,6 +55,7 @@ const initMap = async () => {
   })
 
   google.maps.event.addListener(map, 'click', (event: google.maps.MouseEvent) => {
+    clickedDestination.value = event.latLng; // Get the clicked destination
     if (destinationMarker) {
       // Remove the old destination marker
       destinationMarker.setMap(null)
@@ -70,14 +72,14 @@ const initMap = async () => {
       })
     }
 
-    calculateDirections(map, marker)
+    calculateDirections(map, marker, clickedDestination.value)
   })
 
   return { map }
 }
 
 // TODO: 
-const reverseGeocode = async (latLng) => {
+const reverseGeocode = async (latLng: any) => {
   const geocoder = new google.maps.Geocoder();
 
   try {
@@ -105,12 +107,12 @@ const reverseGeocode = async (latLng) => {
   return null;
 }
 
-const calculateDirections = (map: google.maps.Map, marker: google.maps.Marker) => {
+const calculateDirections = (map: google.maps.Map, marker: google.maps.Marker, destination: any) => {
   const directionsService = new google.maps.DirectionsService()
 
   const request = {
-    origin: marker.getPosition(),
-    destination: { lat: 51.729157, lng: 0.478027 },
+    origin: { lat: 51.729157, lng: 0.478027 },
+    destination,
     travelMode: google.maps.TravelMode.DRIVING
   }
 
@@ -157,7 +159,7 @@ const { map } = onMounted(initMap)
 watchEffect(() => {
   if (map && marker) {
     const initialPosition = map.getCenter()
-    calculateDirections(map, new google.maps.Marker({ position: initialPosition }))
+    calculateDirections(map, new google.maps.Marker({ position: initialPosition }), clickedDestination.value)
   }
 })
 </script>
