@@ -26,7 +26,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(appointment, index) in filteredAppointments" :key="index" :class="{ 'text-gray-400': !appointment.isActive }">
+            <tr
+              v-for="(appointment, index) in filteredAppointments"
+              :key="index"
+              :class="{ 'text-gray-400': !appointment.isActive }"
+            >
               <td class="px-4 py-2 border">{{ appointment.fields.appointment_id }}</td>
               <td class="px-4 py-2 border">{{ appointment.fields.appointment_date }}</td>
               <td class="px-4 py-2 border">{{ appointment.fields.appointment_postcode }}</td>
@@ -109,7 +113,6 @@ onMounted(async () => {
 })
 
 const formattedAppointments = computed(() => {
-  // console.log('appointments.value: ', appointments.value)
   const currentDate = new Date()
 
   appointments.value.forEach((appointment) => {
@@ -135,20 +138,25 @@ const sortAppointments = (columnName: string) => {
   }
 }
 
+const startIndex = computed(() => {
+  console.log('START: ', (currentPage.value - 1) * itemsPerPage.value)
+  return (currentPage.value - 1) * itemsPerPage.value
+})
+
+const endIndex = computed(() => {
+  console.log('END: ', startIndex.value + itemsPerPage.value)
+  return startIndex.value + itemsPerPage.value
+})
+
 const filteredAppointments = computed(() => {
   if (!searchQuery.value) {
-    // return formattedAppointments.value
-    const startIndex = (currentPage.value - 1) * itemsPerPage.value
-    const endIndex = startIndex + itemsPerPage.value
-    return formattedAppointments.value.slice(startIndex, endIndex)
+    return formattedAppointments.value.slice(startIndex.value, endIndex.value)
   }
 
   const query = searchQuery.value.toLowerCase()
   return formattedAppointments.value.filter((appointment) => {
     if (Array.isArray(appointment.fields.agent_name)) {
-      return appointment.fields.agent_name.some((agent: string) =>
-        agent.toLowerCase().includes(query)
-      )
+      return appointment.fields.agent_name.some((agent) => agent.toLowerCase().includes(query))
     } else if (typeof appointment.fields.agent_name === 'string') {
       return appointment.fields.agent_name.toLowerCase().includes(query)
     }
@@ -157,7 +165,10 @@ const filteredAppointments = computed(() => {
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(formattedAppointments.value.length / itemsPerPage.value)
+  const dataToPaginate = searchQuery.value
+    ? filteredAppointments.value
+    : formattedAppointments.value
+  return Math.ceil(dataToPaginate.length / itemsPerPage.value)
 })
 
 const nextPage = () => {
@@ -173,7 +184,6 @@ const prevPage = () => {
 }
 
 const editAppointment = (appointment: any) => {
-  //   console.log('APPOINTMENT: ', appointment)
   router.replace({
     name: 'EstateEditAppointment',
     params: { id: appointment.id }
@@ -181,14 +191,10 @@ const editAppointment = (appointment: any) => {
 }
 
 const deleteCurrentAppointment = async (id: any) => {
-  //   console.log('Delete appointment:', id)
-  //   const result = await deleteAppointment(id)
-  //   console.log(result);
   try {
     console.log('Delete appointment:', id)
     await deleteAppointment(id)
 
-    // After successful deletion, fetch the updated list of appointments
     const updatedAppointments = await fetchAppointments()
     appointments.value = updatedAppointments.records
     console.log('Appointment deleted successfully.')
