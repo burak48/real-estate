@@ -13,7 +13,7 @@
           <input
             type="text"
             id="postalCode"
-            v-model="appointment.postCode"
+            v-model="destinationPostcode"
             class="mt-1 p-2 w-full border rounded-md"
           />
         </div>
@@ -84,7 +84,7 @@
         </div>
 
         <!-- Map component -->
-        <Map />
+        <Map @destinationPostcode="handleDestinationPostcode" />
 
         <!-- Submit Button -->
         <div class="mt-4">
@@ -138,6 +138,11 @@ const resetForm = () => {
 
 const contactOptions = ref([])
 const agentOptions = ref([])
+const destinationPostcode = ref('');
+
+const handleDestinationPostcode = (postcode: string) => {
+  destinationPostcode.value = postcode;
+};
 
 const createCurrentAppointment = async () => {
   console.log(appointment.value)
@@ -182,7 +187,7 @@ onMounted(async () => {
         agent_surname: record.fields.agent_surname
       })
     )
-
+    
     // console.log('appointment.value.agentOptions: ', appointment.value.agentOptions)
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -222,4 +227,10 @@ watch(() => appointment.value.agentId, (newAgentId) => {
     appointment.value.agentSurname = '';
   }
 })
+
+watch(destinationPostcode, (newDestinationPostcode) => {
+  console.log('New destination postcode:', newDestinationPostcode);
+  destinationPostcode.value = newDestinationPostcode;
+});
+
 </script>

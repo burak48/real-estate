@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from 'vue'
+import { ref, onMounted, watchEffect, defineEmits } from 'vue'
 import { Loader, type LoaderOptions } from '@googlemaps/js-api-loader'
 
 const position = ref({ lat: 51.7292, lng: 0.478 })
@@ -17,6 +17,8 @@ const totalDuration = ref('')
 let marker: google.maps.Marker | null = null
 let destinationMarker: google.maps.Marker | null = null
 let directionsRenderer: google.maps.DirectionsRenderer | null = null // Track directions renderer
+
+const emit = defineEmits(['destinationPostcode'])
 
 const initMap = async () => {
   const loaderOptions: LoaderOptions = {
@@ -74,14 +76,51 @@ const initMap = async () => {
   return { map }
 }
 
+// TODO: 
+const reverseGeocode = async (latLng) => {
+  const geocoder = new google.maps.Geocoder();
+
+  try {
+    const results = await new Promise((resolve, reject) => {
+      geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK) {
+          resolve(results);
+        } else {
+          reject(status);
+        }
+      });
+    });
+
+    if (results && results[0] && results[0].address_components) {
+      for (const component of results[0].address_components) {
+        if (component.types.includes('postal_code')) {
+          return component.short_name; // Extract the postcode
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Reverse geocoding error:', error)
+  }
+
+  return null;
+}
+
 const calculateDirections = (map: google.maps.Map, marker: google.maps.Marker) => {
   const directionsService = new google.maps.DirectionsService()
 
   const request = {
     origin: marker.getPosition(),
-    destination: { lat: 51.7292, lng: 0.478 },
+    destination: { lat: 51.729157, lng: 0.478027 },
     travelMode: google.maps.TravelMode.DRIVING
   }
+
+  // TODO: 
+  reverseGeocode(request.destination).then((postcode: any) => {
+    if (postcode) {
+      console.log("POST CODE from MAP: ", postcode)
+      emit('destinationPostcode', postcode);
+    }
+  })
 
   directionsService.route(request, (result, status) => {
     if (status === google.maps.DirectionsStatus.OK) {

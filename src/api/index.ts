@@ -21,8 +21,6 @@ export async function getAppointment(id) {
 }
 
 export async function updateAppointment(data) {
-  console.log("DATA: ", data)
-
   const {
     fields: {
       appointment_date,
@@ -45,12 +43,8 @@ export async function updateAppointment(data) {
     ],
   };
 
-  console.log("NEW DATA: ", newData);
-
   const response = await api.post("/Appointments", newData)
-  console.log("RESPONSE111: ", response)
-  console.log("RESPONSE222: ", response.data)
-  // return response.data
+  return response.data
 }
 
 export async function deleteAppointment(id) {
@@ -64,7 +58,6 @@ export async function deleteAppointment(id) {
 }
 
 export async function createAppointment(appointmentData) {
-  console.log("DATA: ", appointmentData)
   try {
     const requestData = {
       records: [
