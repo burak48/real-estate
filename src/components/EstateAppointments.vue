@@ -26,7 +26,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(appointment, index) in filteredAppointments" :key="index">
+            <tr v-for="(appointment, index) in filteredAppointments" :key="index" :class="{ 'text-gray-400': !appointment.isActive }">
               <td class="px-4 py-2 border">{{ appointment.fields.appointment_id }}</td>
               <td class="px-4 py-2 border">{{ appointment.fields.appointment_date }}</td>
               <td class="px-4 py-2 border">{{ appointment.fields.appointment_postcode }}</td>
@@ -48,12 +48,14 @@
                 <button
                   class="px-2 py-1 text-white bg-blue-500 hover:bg-blue-600 mr-2 mb-2 w-16"
                   @click="editAppointment(appointment)"
+                  :disabled="!appointment.isActive"
                 >
                   Edit
                 </button>
                 <button
                   class="px-2 py-1 text-white bg-red-500 hover:bg-red-600 w-16"
                   @click="deleteCurrentAppointment(appointment.id)"
+                  :disabled="!appointment.isActive"
                 >
                   Delete
                 </button>
@@ -108,6 +110,13 @@ onMounted(async () => {
 
 const formattedAppointments = computed(() => {
   // console.log('appointments.value: ', appointments.value)
+  const currentDate = new Date()
+
+  appointments.value.forEach((appointment) => {
+    const appointmentDate = new Date(appointment.fields.appointment_date)
+    appointment.isActive = appointmentDate >= currentDate
+  })
+
   return appointments.value
 })
 
