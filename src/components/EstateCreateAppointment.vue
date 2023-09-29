@@ -146,10 +146,7 @@ const handleDestinationPostcode = (postcode: string) => {
 };
 
 const createCurrentAppointment = async () => {
-  console.log(appointment.value)
-  const createdAppointments = await createAppointment(appointment.value, destinationPostcode)
-  console.log('createdAppointments: ', createdAppointments)
-
+  await createAppointment(appointment.value, destinationPostcode)
   resetForm();
 }
 
@@ -157,8 +154,6 @@ onMounted(async () => {
   try {
     const contactsResponse = await getContacts()
     const agentsResponse = await getAgents()
-    console.log("contactsResponse: ", contactsResponse)
-    console.log("agentsResponse: ", agentsResponse)
 
     contactOptions.value = contactsResponse.records.map(
       (record: {
@@ -179,8 +174,6 @@ onMounted(async () => {
       })
     )
 
-    // console.log('appointment.value.contactOptions: ', appointment.value.contactOptions)
-
     agentOptions.value = agentsResponse.records.map(
       (record: { id: any, fields: { agent_id: any; agent_name: any; agent_surname: any } }) => ({
         agent_id: record.id,
@@ -188,19 +181,16 @@ onMounted(async () => {
         agent_surname: record.fields.agent_surname
       })
     )
-    
-    // console.log('appointment.value.agentOptions: ', appointment.value.agentOptions)
   } catch (error) {
     console.error('Error fetching data:', error)
   }
 })
 
 watch(() => appointment.value.contactId, (newContactId) => {
-  console.log("newContactID: ", newContactId)
   const selectedContact = contactOptions.value.find(
     (contact) => contact.contact_id === newContactId
   );
-  console.log("SELECTED CONTACT: ", selectedContact)
+
   if (selectedContact) {
     appointment.value.contactName = selectedContact.contact_name;
     appointment.value.contactSurname = selectedContact.contact_surname;
@@ -215,11 +205,10 @@ watch(() => appointment.value.contactId, (newContactId) => {
 })
 
 watch(() => appointment.value.agentId, (newAgentId) => {
-  console.log("newAgentId: ", newAgentId)
   const selectedAgent = agentOptions.value.find(
     (agent) => agent.agent_id === newAgentId
   );
-  console.log("SELECTED AGENT: ", selectedAgent)
+
   if (selectedAgent) {
     appointment.value.agentName = selectedAgent.agent_name;
     appointment.value.agentSurname = selectedAgent.agent_surname;
@@ -230,7 +219,6 @@ watch(() => appointment.value.agentId, (newAgentId) => {
 })
 
 watch(destinationPostcode, (newDestinationPostcode) => {
-  console.log('New destination postcode:', newDestinationPostcode);
   destinationPostcode.value = newDestinationPostcode;
 });
 

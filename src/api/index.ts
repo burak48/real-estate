@@ -11,55 +11,66 @@ const api = axios.create({
 })
 
 export async function fetchAppointments() {
-  const response = await api.get('/Appointments')
-  return response.data
+  try {
+    const response = await api.get('/Appointments')
+    return response.data
+  } catch (error) {
+    console.error('Error fetching appointments:', error)
+  }
 }
 
 export async function getAppointment(id) {
-  const response = await api.get(`/Appointments/${id}`)
-  return response.data
+  try {
+    const response = await api.get(`/Appointments/${id}`)
+    return response.data
+  } catch (error) {
+    console.error('Error getting appointment:', error)
+    throw error
+  }
 }
 
 export async function updateAppointment(data) {
-  const {
-    fields: {
-      appointment_date,
-      appointment_postcode,
-      contact_id,
-      agent_id,
-    },
-  } = data;
+  try {
+    const {
+      fields: { appointment_date, appointment_postcode, contact_id, agent_id }
+    } = data
 
-  const newData = {
-    records: [
-      {
-        fields: {
-          appointment_date,
-          appointment_postcode,
-          contact_id,
-          agent_id,
-        },
-      },
-    ],
-  };
+    const newData = {
+      records: [
+        {
+          fields: {
+            appointment_date,
+            appointment_postcode,
+            contact_id,
+            agent_id
+          }
+        }
+      ]
+    }
 
-  const response = await api.post("/Appointments", newData)
-  return response.data
+    const response = await api.post('/Appointments', newData)
+    return response.data
+  } catch (error) {
+    console.error('Error updating appointment:', error)
+    throw error
+  }
 }
 
 export async function deleteAppointment(id) {
-  const response = await api.delete('/Appointments', {
-    params: {
-      records: [id]
-    }
-  })
-
-  return response.data
+  try {
+    const response = await api.delete('/Appointments', {
+      params: {
+        records: [id]
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error deleting appointment:', error)
+    throw error
+  }
 }
 
 export async function createAppointment(appointmentData, destinationPostcode) {
-  console.log("appointmentData: ", appointmentData)
-  console.log("destinationPostcode:", destinationPostcode.value)
   try {
     const requestData = {
       records: [
@@ -68,30 +79,40 @@ export async function createAppointment(appointmentData, destinationPostcode) {
             appointment_date: appointmentData.appointmentDate,
             appointment_postcode: destinationPostcode.value,
             contact_id: [appointmentData.contactId],
-            agent_id: [appointmentData.agentId],
-          },
-        },
-      ],
-    };
+            agent_id: [appointmentData.agentId]
+          }
+        }
+      ]
+    }
 
-    const response = await api.post('/Appointments', requestData);
+    const response = await api.post('/Appointments', requestData)
 
     if (response.status === 200) {
-      console.log('Appointment created successfully:', response.data);
+      console.log('Appointment created successfully:', response.data)
     } else {
-      console.error('Failed to create appointment:', response.statusText);
+      console.error('Failed to create appointment:', response.statusText)
     }
   } catch (error) {
-    console.error('Error creating appointment:', error);
+    console.error('Error creating appointment:', error)
   }
 }
 
 export async function getContacts() {
-  const response = await api.get('/Contacts')
-  return response.data
+  try {
+    const response = await api.get('/Contacts')
+    return response.data
+  } catch (error) {
+    console.error('Error getting contacts:', error)
+    throw error
+  }
 }
 
 export async function getAgents() {
-  const response = await api.get('/Agents')
-  return response.data
+  try {
+    const response = await api.get('/Agents')
+    return response.data
+  } catch (error) {
+    console.error('Error getting agents:', error)
+    throw error
+  }
 }

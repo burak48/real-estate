@@ -87,7 +87,8 @@
         </div>
       </template>
       <template v-else>
-        <p class="text-center">Loading...</p>
+        <!-- <p class="text-center">Loading...</p> -->
+        <p class="text-center">{{ loading ? 'Loading...' : 'No data found.' }}</p>
       </template>
     </div>
   </div>
@@ -107,9 +108,17 @@ const searchQuery = ref('')
 const itemsPerPage = ref(4)
 const currentPage = ref(1)
 
+const loading = ref(true)
+
 onMounted(async () => {
-  const fetchedAppointments = await fetchAppointments()
-  appointments.value = fetchedAppointments.records
+  try {
+    const fetchedAppointments = await fetchAppointments()
+    appointments.value = fetchedAppointments.records
+  } catch (error) {
+    console.error('Error fetching appointments:', error)
+  } finally {
+    loading.value = false;
+  }
 })
 
 const formattedAppointments = computed(() => {
@@ -139,12 +148,10 @@ const sortAppointments = (columnName: string) => {
 }
 
 const startIndex = computed(() => {
-  console.log('START: ', (currentPage.value - 1) * itemsPerPage.value)
   return (currentPage.value - 1) * itemsPerPage.value
 })
 
 const endIndex = computed(() => {
-  console.log('END: ', startIndex.value + itemsPerPage.value)
   return startIndex.value + itemsPerPage.value
 })
 
@@ -192,9 +199,7 @@ const editAppointment = (appointment: any) => {
 
 const deleteCurrentAppointment = async (id: any) => {
   try {
-    console.log('Delete appointment:', id)
     await deleteAppointment(id)
-
     const updatedAppointments = await fetchAppointments()
     appointments.value = updatedAppointments.records
     console.log('Appointment deleted successfully.')

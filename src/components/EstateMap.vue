@@ -119,7 +119,6 @@ const calculateDirections = (map: google.maps.Map, marker: google.maps.Marker, d
   // TODO: 
   reverseGeocode(request.destination).then((postcode: any) => {
     if (postcode) {
-      console.log("POST CODE from MAP: ", postcode)
       emit('destinationPostcode', postcode);
     }
   })
