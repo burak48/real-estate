@@ -77,7 +77,7 @@ const router = useRouter()
 const { id } = defineProps(['id'])
 
 const isDataLoaded = ref(false)
-const formattedAppointment = ref({})
+const formattedAppointment: any = ref({})
 
 onMounted(async () => {
   formattedAppointment.value = await getAppointment(id)

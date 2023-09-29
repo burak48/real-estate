@@ -19,7 +19,7 @@ export async function fetchAppointments() {
   }
 }
 
-export async function getAppointment(id) {
+export async function getAppointment(id: any) {
   try {
     const response = await api.get(`/Appointments/${id}`)
     return response.data
@@ -29,7 +29,7 @@ export async function getAppointment(id) {
   }
 }
 
-export async function updateAppointment(data) {
+export async function updateAppointment(data: any) {
   try {
     const {
       fields: { appointment_date, appointment_postcode, contact_id, agent_id }
@@ -56,7 +56,7 @@ export async function updateAppointment(data) {
   }
 }
 
-export async function deleteAppointment(id) {
+export async function deleteAppointment(id: any) {
   try {
     const response = await api.delete('/Appointments', {
       params: {
@@ -70,7 +70,7 @@ export async function deleteAppointment(id) {
   }
 }
 
-export async function createAppointment(appointmentData, destinationPostcode) {
+export async function createAppointment(appointmentData: any, destinationPostcode: any) {
   try {
     const requestData = {
       records: [

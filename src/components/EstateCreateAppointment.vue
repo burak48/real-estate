@@ -105,7 +105,7 @@ import { ref, onMounted, watch } from 'vue'
 import Map from '@/components/EstateMap.vue'
 import { createAppointment, getContacts, getAgents } from '@/api/index'
 
-const appointment = ref({
+const appointment: any = ref({
   appointmentDate: '',
   appointmentPostCode: '',
   postCode: 'cm27pj',
@@ -137,8 +137,24 @@ const resetForm = () => {
 };
 
 
-const contactOptions = ref([])
-const agentOptions = ref([])
+type Contact = {
+  contact_id: number;
+  contact_name: string;
+  contact_surname: string;
+};
+
+const contactOptions = ref<Contact[]>([]);
+// const contactOptions = ref([])
+
+type Agent = {
+  agent_id: number;
+  agent_name: string;
+  agent_surname: string;
+};
+
+const agentOptions = ref<Agent[]>([]);
+// const agentOptions = ref([])
+
 const destinationPostcode = ref('');
 
 const handleDestinationPostcode = (postcode: string) => {
@@ -187,8 +203,8 @@ onMounted(async () => {
 })
 
 watch(() => appointment.value.contactId, (newContactId) => {
-  const selectedContact = contactOptions.value.find(
-    (contact) => contact.contact_id === newContactId
+  const selectedContact: any = contactOptions.value.find(
+    (contact: any) => contact.contact_id === newContactId
   );
 
   if (selectedContact) {
@@ -205,8 +221,8 @@ watch(() => appointment.value.contactId, (newContactId) => {
 })
 
 watch(() => appointment.value.agentId, (newAgentId) => {
-  const selectedAgent = agentOptions.value.find(
-    (agent) => agent.agent_id === newAgentId
+  const selectedAgent: any = agentOptions.value.find(
+    (agent: any) => agent.agent_id === newAgentId
   );
 
   if (selectedAgent) {

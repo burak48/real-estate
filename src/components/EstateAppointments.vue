@@ -101,7 +101,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const appointments = ref([])
+const appointments: any = ref([])
 const sortBy = ref('appointment_date')
 const sortOrder = ref('asc')
 const searchQuery = ref('')
@@ -124,7 +124,7 @@ onMounted(async () => {
 const formattedAppointments = computed(() => {
   const currentDate = new Date()
 
-  appointments.value.forEach((appointment) => {
+  appointments.value.forEach((appointment: any) => {
     const appointmentDate = new Date(appointment.fields.appointment_date)
     appointment.isActive = appointmentDate >= currentDate
   })
@@ -139,9 +139,9 @@ const sortAppointments = (columnName: string) => {
   } else {
     sortBy.value = columnName
     sortOrder.value = 'asc'
-    formattedAppointments.value.sort((a, b) => {
-      const dateA = new Date(a.fields[columnName])
-      const dateB = new Date(b.fields[columnName])
+    formattedAppointments.value.sort((a: any, b: any) => {
+      const dateA: any = new Date(a.fields[columnName])
+      const dateB: any = new Date(b.fields[columnName])
       return sortOrder.value === 'asc' ? dateA - dateB : dateB - dateA
     })
   }
@@ -161,9 +161,9 @@ const filteredAppointments = computed(() => {
   }
 
   const query = searchQuery.value.toLowerCase()
-  return formattedAppointments.value.filter((appointment) => {
+  return formattedAppointments.value.filter((appointment: any) => {
     if (Array.isArray(appointment.fields.agent_name)) {
-      return appointment.fields.agent_name.some((agent) => agent.toLowerCase().includes(query))
+      return appointment.fields.agent_name.some((agent: any) => agent.toLowerCase().includes(query))
     } else if (typeof appointment.fields.agent_name === 'string') {
       return appointment.fields.agent_name.toLowerCase().includes(query)
     }

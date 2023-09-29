@@ -14,9 +14,9 @@ const position = ref({ lat: 51.7292, lng: 0.478 })
 const showDirections = ref(false)
 const directionsSteps = ref([])
 const totalDuration = ref('')
-let marker: google.maps.Marker | null = null
-let destinationMarker: google.maps.Marker | null = null
-let directionsRenderer: google.maps.DirectionsRenderer | null = null // Track directions renderer
+let marker: any | null = null
+let destinationMarker: any | null = null
+let directionsRenderer: any | null = null
 const clickedDestination = ref()
 
 const emit = defineEmits(['destinationPostcode'])
@@ -54,7 +54,7 @@ const initMap = async () => {
     clickable: false
   })
 
-  google.maps.event.addListener(map, 'click', (event: google.maps.MouseEvent) => {
+  google.maps.event.addListener(map, 'click', (event: any) => {
     clickedDestination.value = event.latLng; // Get the clicked destination
     if (destinationMarker) {
       // Remove the old destination marker
@@ -83,7 +83,7 @@ const reverseGeocode = async (latLng: any) => {
   const geocoder = new google.maps.Geocoder();
 
   try {
-    const results = await new Promise((resolve, reject) => {
+    const results: any = await new Promise((resolve, reject) => {
       geocoder.geocode({ location: latLng }, (results, status) => {
         if (status === google.maps.GeocoderStatus.OK) {
           resolve(results);
@@ -93,10 +93,12 @@ const reverseGeocode = async (latLng: any) => {
       });
     });
 
-    if (results && results[0] && results[0].address_components) {
-      for (const component of results[0].address_components) {
-        if (component.types.includes('postal_code')) {
-          return component.short_name; // Extract the postcode
+    for (const result of results) {
+      if (result.address_components) {
+        for (const component of result.address_components) {
+          if (component.types.includes('postal_code')) {
+            return component.short_name; // Extract the postcode
+          }
         }
       }
     }
@@ -123,10 +125,10 @@ const calculateDirections = (map: google.maps.Map, marker: google.maps.Marker, d
     }
   })
 
-  directionsService.route(request, (result, status) => {
+  directionsService.route(request, (result: any, status) => {
     if (status === google.maps.DirectionsStatus.OK) {
       const route = result.routes[0]
-      const steps = route.legs[0].steps.map((step) => step.instructions)
+      const steps = route.legs[0].steps.map((step: any) => step.instructions)
       const duration = route.legs[0].duration.text
 
       directionsSteps.value = steps
@@ -153,6 +155,8 @@ const calculateDirections = (map: google.maps.Map, marker: google.maps.Marker, d
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 const { map } = onMounted(initMap)
 
 watchEffect(() => {
